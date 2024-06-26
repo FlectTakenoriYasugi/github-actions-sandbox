@@ -1,0 +1,98 @@
+name: exp-pana-api
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'exp-pana-api/**'
+      - '.github/workflows/exp-pana-api.yml'
+  pull_request:
+    paths:
+      - 'exp-pana-api/**'
+      - '.github/workflows/exp-pana-api.yml'
+env:
+  APP_NAME: exp-pana-api
+  ANYPOINT_APP_NAME: exp-pana-api
+  REQUEST_BODY1: test.json
+jobs:
+  job-exp-pana-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: MUnit Test
+        if: ${{ github.event_name == 'push' }}
+        id: MUnit
+        run: mvn test -P test -Dapp-name=kdev-$APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DmuleDeploy -s settings.xml -f $APP_NAME/pom.xml --batch-mode --update-snapshots verify
+      - name: Deploy On Anypoint Platform 
+        if: ${{ success() }}
+        id: deploy
+        run: mvn -e deploy -P dev -Dapp-name=$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DskipTests -DmuleDeploy -s settings.xml -f $APP_NAME/pom.xml --batch-mode --update-snapshots verify
+      - name: Request Test 1
+        if: ${{ success() }}
+        id: test1
+        run: curl --request GET http://$ANYPOINT_APP_NAME.jp-e1.cloudhub.io/helloget -s
+      - name: Request Test 3
+        if: ${{ steps.deploy.conclusion == 'success' }} 
+        run: curl -X POST -F upfile=@.github/workflows/testdata/REQUEST_BODY1 http://$ANYPOINT_APP_NAME.jp-e1.cloudhub.io/hellopost -s
+        
+      - name: API Scenario Test
+        if: ${{ success() }} 
+        run: newman run postman/GitHubActionsTest.postman_collection.json --verbose
+      
+      # Postman に課金すれば以下が使える
+      - name: Setup Postman Collection File # コレクションファイルの取得
+        if: ${{ success() }} 
+        run: curl https://api.getpostman.com/collections/${{ secrets.POSTMAN_COLLECTION_ID }}?apikey=${{ secrets.POSTMAN_API_KEY }} > postman_collection.json
+      - name: API Scenario Test # API シナリオテスト
+        if: ${{ success() }} 
+        run: newman run ./postman_collection.json --verbose
+      # Anypoint CLI を使ったデプロイ
+      - name: デプロイ
+        if: ${{ success() }}
+        id: deploy
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:deploy $APP_NAME sys-pana-api/target/sys-pana-api-1.0.0-SNAPSHOT-mule-application.jar --workerSize 0.1
+
+      # Anypoint CLI を使ったアプリの修正、ランタイムの開始、ランタイムの終了
+      - name: アプリのパッケージング
+        if: ${{ success() }}
+        id: packaging
+        run: cd $PROJECT_NAME ; mvn package -Dmaven.test.skip ; cd ..
+      - name: パッケージのアップロード
+        if: ${{ success() }}
+        id: upload-package
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:modify $ANYPOINT_APP_NAME sys-pana-api/target/sys-pana-api-1.0.0-SNAPSHOT-mule-application.jar
+      - name: ランタイムでアプリケーションの開始
+        if: ${{ success() }}
+        id: start-application
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:start $ANYPOINT_APP_NAME
+      - name: ランタイムでアプリケーションの終了
+        if: ${{ success() }}
+        id: start-application
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:stop $ANYPOINT_APP_NAME
+      - name: デプロイ
+        if: ${{ success() }}
+        id: deploy
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:deploy $ANYPOINT_APP_NAME sys-pana-api/target/sys-pana-api-1.0.0-SNAPSHOT-mule-application.jar --workerSize 0.1
+      # Anypoint CLI のテスト
+      - name: test cli
+        if: ${{ true }}
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:list
+
+      
+      #maven plugin でのデプロイ
+      #run: mvn -e deploy -P dev -Dapp-name=$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DskipTests -DmuleDeploy -s settings.xml -f $PROJECT_DIRECTORY/pom.xml --batch-mode --update-snapshots verify || (anypoint-cli-v4 runtime-mgr:cloudhub-application:modify $ANYPOINT_APP_NAME $PROJECT_DIRECTORY/target/$APP_NAME-1.0.0-SNAPSHOT-mule-application.jar ; anypoint-cli-v4 runtime-mgr:cloudhub-application:start $ANYPOINT_APP_NAME) 
+
+      # 不完全なエラー時の処理
+      #run: mvn -e deploy -P dev -Dapp-name=$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DskipTests -DmuleDeploy -s settings.xml -f $PROJECT_DIRECTORY/pom.xml --batch-mode --update-snapshots verify || (anypoint-cli-v4 runtime-mgr:cloudhub-application:start $ANYPOINT_APP_NAME ; anypoint-cli-v4 runtime-mgr:cloudhub-application:modify $ANYPOINT_APP_NAME $PROJECT_DIRECTORY/target/$APP_NAME-1.0.0-SNAPSHOT-mule-application.jar)
