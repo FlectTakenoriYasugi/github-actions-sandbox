@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="debe403b-842e-4678-b757-a2b2c74ded91" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="get-exp-pana-apiFlow" doc:id="c6206c42-f343-43b3-a263-5a3fd567973b" >
+		<http:listener doc:name="Http Listener" doc:id="2473489e-17b5-462a-9725-d48d3b5bf765" config-ref="HTTP_Listener_config" path="helloget" allowedMethods="GET"/>
+		<set-payload value="exp get hello world !" doc:name="exp get hello world !" doc:id="c81b1250-31cf-4389-9d74-f71a666f6af1" />
+	</flow>
+	<flow name="post-exp-pana-apiFlow" doc:id="8d8cd8c1-660b-4969-9189-bbaf8f589efd" >
+		<http:listener doc:name="Http Listener" doc:id="81d54647-c2a9-4c8b-8a78-8255a1afc2b3" config-ref="HTTP_Listener_config" path="hellopost" allowedMethods="POST" />
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="83252049-fb92-4e3e-a13d-081bb279e5e6" />
+	</flow>
+</mule>

@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "a7341c33-256e-4550-a343-5cc922c9c7e9",
+		"name": "proc-pana-example-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetHello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"リクエストはステータス コードが 200 で成功\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"リクエストのボディが helloGet で成功\", function () {",
+							"  pm.response.to.have.body(\"helloGet\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://dev-test-github-actions.jp-e1.cloudhub.io/helloget?test=test",
+					"protocol": "http",
+					"host": [
+						"dev-test-github-actions",
+						"jp-e1",
+						"cloudhub",
+						"io"
+					],
+					"path": [
+						"helloget"
+					],
+					"query": [
+						{
+							"key": "test",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostHello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"リクエストはステータス コードが 200 で成功\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"リクエストのボディが helloPost で成功\", function () {",
+							"  pm.response.to.have.body(\"helloPost\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "helloPost",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://dev-proc-pana-example-api.cloudhub.io/hellopost",
+					"protocol": "http",
+					"host": [
+						"dev-proc-pana-example-api",
+						"cloudhub",
+						"io"
+					],
+					"path": [
+						"hellopost"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
