@@ -63,22 +63,22 @@ jobs:
         if: ${{ success() || steps.scenarioTest.conclusion == 'failure' }}
         run: anypoint-cli-v4 runtime-mgr:cloudhub-application:delete $ANYPOINT_APP_NAME
       # 上記までの処理が成功した場合、以下の成功通知処理が実行される
-      - name: Slack Notification Success
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: good
-          SLACK_TITLE: Success to Deploy to GitHub Pages :rocket:'
-          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+      # - name: Slack Notification Success
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_COLOR: good
+      #     SLACK_TITLE: Success to Deploy to GitHub Pages :rocket:'
+      #     SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
       # 上記までの処理のいずれかが失敗した場合、以下の失敗通知処理が実行される
-      - name: Slack Notification Failure
-        if: ${{ failure() }} # ← 上記までのいずれかが失敗した場合にこの条件が真になる.
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: danger
-          SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
-          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+      # - name: Slack Notification Failure
+      #   if: ${{ failure() }} # ← 上記までのいずれかが失敗した場合にこの条件が真になる.
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_COLOR: danger
+      #     SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
+      #     SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
   uploadIfSpecification:
     runs-on: ubuntu-latest
     steps:
