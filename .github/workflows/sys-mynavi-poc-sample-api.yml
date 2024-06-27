@@ -48,7 +48,21 @@ jobs:
       - name: Deploy On Anypoint Platform
         if: ${{ success() }}
         id: deploy
-        run: mvn -e deploy -P dev -Dapp-name=$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DskipTests -DmuleDeploy -s settings.xml -f $PROJECT_NAME/pom.xml --batch-mode --update-snapshots verify
+        run: >
+          mvn -e deploy -P dev 
+          -Dapp-name=$ANYPOINT_APP_NAME 
+          -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} 
+          -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }}
+          -Dconnected.app.client.id=${{ secrets.CONNECTED_APP_CLIENT_ID }} 
+          -Dconnected.app.client.secret=${{ secrets.CONNECTED_APP_CLIENT_SECRET }} 
+          -Dworker-cnt=1 
+          -Dworker-type=MICRO -DskipTests 
+          -DmuleDeploy
+          -s settings.xml
+          -f $PROJECT_NAME/pom.xml
+          --batch-mode
+          --update-snapshots verify
+
       # Newman のインストール
       - name: Newman Install
         if: ${{ success() }}
