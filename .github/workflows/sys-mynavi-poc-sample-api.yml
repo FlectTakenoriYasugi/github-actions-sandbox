@@ -54,7 +54,7 @@ jobs:
           -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} 
           -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }}
           -Dconnected.app.client.id=${{ secrets.CONNECTED_APP_CLIENT_ID }} 
-          -Dconnected.app.client.secret=${{ secrets.CONNECTED_APP_CLIENT_SECRET }} 
+          -Dconnected.app.client.secret=${{ secrets.CONNECTED_APP_CLIENT_SECRET }}
           -Dworker-cnt=1 
           -Dworker-type=MICRO -DskipTests 
           -DmuleDeploy

@@ -1,39 +1,28 @@
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
 
 	<profiles>
 		<profile>
-			<id>test</id>
-			<properties>
-        <resource.directory>${basedir}/src/main/resources/</resource.directory>
-				<business.group.id>44be8843-022e-456d-bc90-2a228158d462</business.group.id>
-				<business.group.name>MuleSoft Exercise Environment</business.group.name>			
-				<environment.name>Sandbox</environment.name>
-				<client.id>37923282df8e4b8ba2b743f7a1df1f89</client.id>
-				<client.secret>Bcc118e671f843AfAC89BC1BA86B448e</client.secret>
-				<app.name.prefix>tst</app.name.prefix>
-			</properties>
-		</profile>
-    <profile>
 			<id>dev</id>
 			<properties>
 				<resource.directory>${basedir}/src/dev/resources/</resource.directory>
-				<business.group.id>44be8843-022e-456d-bc90-2a228158d462</business.group.id>
-				<business.group.name>MuleSoft Exercise Environment</business.group.name>
+				<business.group.id>907ce755-d953-4825-9c0b-6c7c39e2ca07</business.group.id>
+				<business.group.name>PoC BG</business.group.name>
 				<environment.name>Sandbox</environment.name>
-				<client.id>37923282df8e4b8ba2b743f7a1df1f89</client.id>
-				<client.secret>Bcc118e671f843AfAC89BC1BA86B448e</client.secret>
+				<client.id>fc62c60ea6424bdbbad167463627a68b</client.id>
+				<client.secret>b322E20b1ab649f9bF9F496B3a62D632</client.secret>
 				<app.name.prefix>dev</app.name.prefix>
 			</properties>
 		</profile>
 	</profiles>
 
 	<servers>
-		<server>
+		<!-- <server>
 			<id>MuleRepository</id>
 			<username>bic.camera.inc.nexus</username>
 			<password>xaAnDHcKpZjLBDN</password>
-		</server>
+		</server> -->
 		<server>
 			<id>my.anypoint.credentials</id>
 			<username>${anypoint.username}</username>
