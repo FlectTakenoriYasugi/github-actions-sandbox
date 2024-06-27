@@ -1,0 +1,122 @@
+name: sys-mynavi-poc-sample-api
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "sys-mynavi-poc-api/**"
+      - ".github/workflows/sys-mynavi-poc-sample-api.yml"
+  pull_request:
+    paths:
+      - "sys-mynavi-poc-api/**"
+      - ".github/workflows/sys-mynavi-poc-sample-api.yml"
+env:
+  ANYPOINT_APP_NAME: dev-sys-mynavi-poc-sample-api
+  ANYPOINT_ENVIRONMENT: "Sandbox"
+  POSTMAN_COLLECTION: postman-api-scenario-test/sys/mynavi
+  PROJECT_NAME: sys-mynavi-api
+jobs:
+  munit-deploy-apiTest-undeploy-slackNotification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # 準備.
+      - name: Setup JDK 1.8
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Cache Maven packages
+        if: ${{ success() }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Setup Node
+        if: ${{ success() }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      # MUnit Test.
+      - name: MUnit Test
+        if: ${{ success() }}
+        id: MUnit
+        run: mvn test -P test -Dapp-name=kdev-$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DmuleDeploy -s settings.xml -f $PROJECT_NAME/pom.xml --batch-mode --update-snapshots verify
+      # Anypoint CLI の準備
+      - name: Setup Anypoint CLI
+        if: ${{ success() }}
+        run: sudo npm install -g anypoint-cli-v4 ; anypoint-cli-v4 plugins:install anypoint-cli-cloudhub-plugin ; anypoint-cli-v4 plugins:install anypoint-cli-designcenter-plugin; anypoint-cli-v4 conf username ${{ secrets.FLECT_ANYPOINT_USER }} ; anypoint-cli-v4 conf password ${{ secrets.FLECT_ANYPOINT_PASSWORD }} ; anypoint-cli-v4 conf organization ${{ secrets.FLECT_ANYPOINT_ORGANIZATION }} ; anypoint-cli-v4 conf environment $ANYPOINT_ENVIRONMENT
+      # CloudHub へのデプロイ
+      - name: Deploy On Anypoint Platform
+        if: ${{ success() }}
+        id: deploy
+        run: mvn -e deploy -P dev -Dapp-name=$ANYPOINT_APP_NAME -Danypoint.username=${{ secrets.FLECT_ANYPOINT_USER }} -Danypoint.password=${{ secrets.FLECT_ANYPOINT_PASSWORD }} -Dworker-cnt=1 -Dworker-type=MICRO -DskipTests -DmuleDeploy -s settings.xml -f $PROJECT_DIRECTORY/pom.xml --batch-mode --update-snapshots verify
+      # Newman のインストール
+      - name: Newman Install
+        if: ${{ success() }}
+        run: sudo npm install -g newman
+      # Postman によるAPI シナリオテスト
+      - name: API Scenario Test
+        if: ${{ success() }}
+        id: scenarioTest
+        run: newman run $POSTMAN_COLLECTION --verbose
+      # アプリケーションの削除
+      - name: Delete Application
+        if: ${{ success() || steps.scenarioTest.conclusion == 'failure' }}
+        run: anypoint-cli-v4 runtime-mgr:cloudhub-application:delete $ANYPOINT_APP_NAME
+      # 上記までの処理が成功した場合、以下の成功通知処理が実行される
+      - name: Slack Notification Success
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: good
+          SLACK_TITLE: Success to Deploy to GitHub Pages :rocket:'
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+      # 上記までの処理のいずれかが失敗した場合、以下の失敗通知処理が実行される
+      - name: Slack Notification Failure
+        if: ${{ failure() }} # ← 上記までのいずれかが失敗した場合にこの条件が真になる.
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: danger
+          SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+  uploadIfSpecification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # 準備
+      - name: Setup Node
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      # Anypoint CLI の準備
+      - name: Setup Anypoint CLI
+        if: ${{ github.event_name == 'push' }}
+        id: anypoint-cli-prepare
+        run: sudo npm install -g anypoint-cli-v4 ; anypoint-cli-v4 plugins:install anypoint-cli-cloudhub-plugin ; anypoint-cli-v4 plugins:install anypoint-cli-designcenter-plugin; anypoint-cli-v4 conf username ${{ secrets.FLECT_ANYPOINT_USER }} ; anypoint-cli-v4 conf password ${{ secrets.FLECT_ANYPOINT_PASSWORD }} ; anypoint-cli-v4 conf organization ${{ secrets.FLECT_ANYPOINT_ORGANIZATION }} ; anypoint-cli-v4 conf environment $ANYPOINT_ENVIRONMENT
+      # IF 仕様書の Design Center でのアップデート
+      - name: Upload IF Specification
+        if: ${{ steps.anypoint-cli-prepare.conclusion == 'success' }}
+        id: upload-if-specification
+        run: anypoint-cli-v4 designcenter:project:upload $PROJECT_NAME $PROJECT_NAME/src/main/resources/api || anypoint-cli-v4 designcenter:project:create $PROJECT_NAME $PROJECT_NAME/src/main/resources/api
+      # 上記までの処理が成功した場合、以下の成功通知処理が実行される
+      - name: Slack Notification Success
+        if: ${{ github.event_name == 'push' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: good
+          SLACK_TITLE: Success to Deploy to GitHub Pages :rocket:'
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"
+      # 上記までの処理のいずれかが失敗した場合、以下の失敗通知処理が実行される
+      - name: Slack Notification Failure
+        if: ${{ failure() }} # ← 上記までのいずれかが失敗した場合にこの条件が真になる.
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: danger
+          SLACK_TITLE: "Failure to Deploy to GitHub Pages :boom:"
+          SLACK_MESSAGE: ":closed_book: ${{ github.repository }}"

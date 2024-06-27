@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "4680ba69-96e9-4dea-a1ce-0ce2d87358b0",
-		"name": "sys-pana-example-api",
+		"name": "sys-mynavi-example-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -28,10 +28,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://dev-sys-pana-example-api.jp-e1.cloudhub.io/helloget?test=test",
+					"raw": "http://dev-sys-mynavi-example-api.jp-e1.cloudhub.io/helloget?test=test",
 					"protocol": "http",
 					"host": [
-						"dev-sys-pana-example-api",
+						"dev-sys-mynavi-example-api",
 						"jp-e1",
 						"cloudhub",
 						"io"
@@ -81,10 +81,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://dev-sys-pana-example-api.jp-e1.cloudhub.io/hellopost",
+					"raw": "http://dev-sys-mynavi-example-api.jp-e1.cloudhub.io/hellopost",
 					"protocol": "http",
 					"host": [
-						"dev-sys-pana-example-api",
+						"dev-sys-mynavi-example-api",
 						"jp-e1",
 						"cloudhub",
 						"io"
