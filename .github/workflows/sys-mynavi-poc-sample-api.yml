@@ -6,17 +6,14 @@ on:
     paths:
       - "sys-mynavi-poc-api/**"
       - ".github/workflows/sys-mynavi-poc-sample-api.yml"
-  pull_request:
-    paths:
-      - "sys-mynavi-poc-api/**"
-      - ".github/workflows/sys-mynavi-poc-sample-api.yml"
+
 env:
   ANYPOINT_APP_NAME: dev-sys-mynavi-poc-sample-api
   ANYPOINT_ENVIRONMENT: "Sandbox"
   POSTMAN_COLLECTION: postman-api-scenario-test/sys/mynavi
-  PROJECT_NAME: sys-mynavi-api
+  PROJECT_NAME: sys-mynavi-poc-api
 jobs:
-  munit-deploy-apiTest-undeploy-slackNotification:
+  on-pushed-simple-munit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
