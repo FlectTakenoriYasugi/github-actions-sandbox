@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # 準備.
+      # 準備
       - name: Setup JDK 1.8
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/setup-java@v1
