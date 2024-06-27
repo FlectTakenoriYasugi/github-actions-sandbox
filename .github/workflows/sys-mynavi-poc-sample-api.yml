@@ -11,7 +11,7 @@ env:
   ANYPOINT_APP_NAME: dev-sys-mynavi-poc-sample-api
   ANYPOINT_ENVIRONMENT: "Sandbox"
   POSTMAN_COLLECTION: postman-api-scenario-test/sys/mynavi
-  PROJECT_NAME: sys-mynavi-poc-api
+  PROJECT_NAME: sys-mynavi-poc-sample-api
 jobs:
   on-pushed-simple-munit-test:
     runs-on: ubuntu-latest
