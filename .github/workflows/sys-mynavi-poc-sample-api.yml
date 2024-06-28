@@ -6,6 +6,7 @@ on:
     paths:
       - "sys-mynavi-poc-api/**"
       - ".github/workflows/sys-mynavi-poc-sample-api.yml"
+      - "settings.xml"
 
 env:
   ANYPOINT_APP_NAME: dev-sys-mynavi-poc-sample-api
