@@ -37,7 +37,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.mule.tools.maven</groupId>
+				<!-- <groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
@@ -54,12 +54,39 @@
 						<workerType>${worker-type}</workerType>
 						<objectStoreV2>true</objectStoreV2>
 						<properties>
-							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+				<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
 							<anypoint.platform.client_id>${client.id}</anypoint.platform.client_id>
 							<anypoint.platform.client_secret>${client.secret}</anypoint.platform.client_secret>
 						</properties>
 					</cloudHubDeployment>
 					<classifier>mule-application</classifier>
+				</configuration> -->
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>3.7.1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<cloudhub2Deployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<provider>MC</provider>
+						<environment>${environment}</environment>
+						<target>${targetName}</target>
+						<muleVersion>${muleVersion}</muleVersion>
+						<username>${user}</username>
+						<password>${pass}</password>
+						<applicationName>${appName}</applicationName>
+						<replicas>1</replicas>
+						<vCores>1</vCores>
+						<deploymentSettings>
+							<http>
+								<inbound>
+									<publicUrl>${publicURL}</publicUrl>
+									<forwardSslSession>true</forwardSslSession>
+									<lastMileSecurity>true</lastMileSecurity>
+								</inbound>
+							</http>
+						</deploymentSettings>
+					</cloudhub2Deployment>
 				</configuration>
 			</plugin>
 			<plugin>
