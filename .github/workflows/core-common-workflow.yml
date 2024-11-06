@@ -12,6 +12,13 @@ on:
       - 'release/**'
     paths:
       - 'dev/**'
+  push:
+    branches:
+      - 'develop'
+      - 'release/**'
+    paths:
+      - 'dev/**'
+  
 env:
   APP_NAME: ${{ inputs.APP_NAME }} 
   MVN_SETUP: curl -OL https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz && tar -xzf apache-maven-3.9.6-bin.tar.gz
@@ -69,4 +76,4 @@ jobs:
         echo "PROJECT_NAME=${TRIMMED_PROJECT_NAME}" >> $GITHUB_ENV
     
     - name: Use the extracted projectname
-      run: echo "The project name is '${{ steps.extract_projectname.outputs.projectname }}'"
+      run: echo "The project name is '${PROJECT_NAME}'"
