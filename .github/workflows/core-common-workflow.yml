@@ -7,6 +7,11 @@ on:
         description: APP_NAME
         type: string
         required: true
+  pull_request:
+    branches:
+      - 'release/**'
+    paths:
+      - 'dev/**'
 env:
   APP_NAME: ${{ inputs.APP_NAME }} 
   MVN_SETUP: curl -OL https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz && tar -xzf apache-maven-3.9.6-bin.tar.gz
@@ -17,7 +22,6 @@ env:
       || github.ref_name == 'staging' && 'staging'
       ||                                 'dev'
       }}
-  PROJECT_NAME: ""
 
 jobs:
   called-build:
