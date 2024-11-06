@@ -14,6 +14,7 @@ on:
       - 'dev/**'
   push:
     branches:
+      - 'develop'
       - 'release/**'
     paths:
       - 'dev/**'
