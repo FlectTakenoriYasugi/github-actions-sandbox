@@ -17,6 +17,7 @@ env:
       || github.ref_name == 'staging' && 'staging'
       ||                                 'dev'
       }}
+  PROJECT_NAME: ""
 
 jobs:
   called-build:
@@ -44,5 +45,24 @@ jobs:
     - name: setup maven
       run: ${{ env.MVN_SETUP }}
 
-    - name: cat dev/${{ inputs.APP_NAME }}/pom.xml
-      run: cat dev/${{ inputs.APP_NAME }}/pom.xml
+    - name: extract-projectname
+      id: extract_projectname
+      run: |
+        # ブランチ名を取得
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        echo "Branch name: ${BRANCH_NAME}"
+
+        TRIMMED_PROJECT_NAME=""
+
+        # release/以降の文字列を取得 その他のブランチの場合は空文字がセットされる。
+        if [[ "$BRANCH_NAME" =~ ^release/\s*(.+?)\s*$ ]]; then
+          PROJECT_NAME="${BASH_REMATCH[1]}"
+          TRIMMED_PROJECT_NAME=$(echo "$PROJECT_NAME" | xargs)
+        fi
+
+        # 環境変数に格納
+        echo "Project name: '${TRIMMED_PROJECT_NAME}'"
+        echo "PROJECT_NAME=${TRIMMED_PROJECT_NAME}" >> $GITHUB_ENV
+    
+    - name: Use the extracted projectname
+      run: echo "The project name is '${{ steps.extract_projectname.outputs.projectname }}'"
