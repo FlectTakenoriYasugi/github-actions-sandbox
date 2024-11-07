@@ -61,7 +61,7 @@ jobs:
         # release/以降の文字列を取得 その他のブランチの場合は空文字がセットされる。
         if [[ "$BRANCH_NAME" =~ ^release/\s*(.+?)\s*$ ]]; then
           PROJECT_NAME="${BASH_REMATCH[1]}"
-          TRIMMED_PROJECT_NAME=$(echo "$PROJECT_NAME" | xargs)
+          TRIMMED_PROJECT_NAME=-$(echo "$PROJECT_NAME" | xargs)
         fi
 
         # 環境変数に格納
@@ -69,4 +69,4 @@ jobs:
         echo "PROJECT_NAME=${TRIMMED_PROJECT_NAME}" >> $GITHUB_ENV
     
     - name: Use the extracted projectname
-      run: echo "The project name is '${{ steps.extract_projectname.outputs.projectname }}'"
+      run: echo "The project name is ${{ PROJECT_NAME }}"
