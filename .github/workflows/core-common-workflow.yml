@@ -76,4 +76,4 @@ jobs:
         echo "PROJECT_NAME=${TRIMMED_PROJECT_NAME}" >> $GITHUB_ENV
     
     - name: Use the extracted projectname
-      run: echo "The project name is ${{ PROJECT_NAME }}"
+      run: echo "The project name is ${{ env.PROJECT_NAME }}"
