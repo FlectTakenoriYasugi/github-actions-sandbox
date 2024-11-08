@@ -60,7 +60,7 @@ jobs:
       id: extract_projectname
       run: |
         # ブランチ名を取得
-        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        BRANCH_NAME=${GITHUB_REF_NAME}
         echo "Branch name: ${BRANCH_NAME}"
 
         TRIMMED_PROJECT_NAME=""
