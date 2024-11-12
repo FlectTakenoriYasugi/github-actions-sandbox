@@ -80,5 +80,5 @@ jobs:
       run: echo "The project name is ${{ env.PROJECT_NAME }}"
 
     - name: workflow_dispatch test
-      if: ${{ ((github.event_name == 'push'  && (github.ref_name == 'main' && github.event_name == 'workflow_dispatch') }}
+      if: ${{ (github.event_name == 'push'  && (github.ref_name == 'main' && github.event_name == 'workflow_dispatch')) }}
       run: echo "ok"
