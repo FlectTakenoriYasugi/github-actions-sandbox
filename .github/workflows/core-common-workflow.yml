@@ -7,6 +7,7 @@ on:
         description: APP_NAME
         type: string
         required: true
+  workflow_dispatch:
   pull_request:
     branches:
       - 'release/**'
@@ -77,3 +78,7 @@ jobs:
     
     - name: Use the extracted projectname
       run: echo "The project name is ${{ env.PROJECT_NAME }}"
+
+    - name: workflow_dispatch test
+      if: ${{ ((github.event_name == 'push'  && (github.ref_name='main' && github.event_name == 'workflow_dispatch') }}
+      run: echo "ok"
