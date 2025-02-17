@@ -1,0 +1,27 @@
+name: mynavi-uriage-sys
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'release/**'
+      - 'develop'
+      - 'staging'
+      - 'main'
+    paths:
+      - 'dev/mynavi-uriage-sys/**'
+  push:
+    branches:
+      - 'release/**'
+      - 'develop'
+      - 'staging'
+      - 'main'
+    paths:
+      - 'dev/mynavi-uriage-sys/**'
+
+jobs:
+  build:
+    uses: ./.github/workflows/core-common-workflow.yml
+    with:
+      APP_NAME: mynavi-uriage-sys
+    secrets: inherit
