@@ -21,7 +21,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/core-common-workflow.yml
+    uses: ./.github/workflows/core-common-workflow_dummy.yml
     with:
       APP_NAME: mynavi-uriage-sys
     secrets: inherit
