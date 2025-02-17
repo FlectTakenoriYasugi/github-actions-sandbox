@@ -1,0 +1,76 @@
+name: Reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      APP_NAME:
+        description: APP_NAME
+        type: string
+        required: true
+env:
+  APP_NAME: ${{ inputs.APP_NAME }}
+  MVN_SETUP: curl -OL https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz && tar -xzf apache-maven-3.9.6-bin.tar.gz
+  MVN_CMD: ./apache-maven-3.9.6/bin/mvn
+  PROFILE: |-
+    ${{
+       github.ref_name == 'main' && 'production'
+    || github.ref_name == 'staging' && 'staging'
+    ||                                 'dev'
+    }}
+
+jobs:
+  called-build:
+    runs-on: ubuntu-latest
+    environment: |-
+      ${{
+         github.ref_name == 'main' && 'Production'
+      || github.ref_name == 'staging' && 'Staging'
+      ||                                 'Develop'
+      }}
+    steps:
+      - name: run-test
+        run: echo ${APP_NAME}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "zulu"
+          cache: "maven"
+
+      - name: setup maven
+        run: ${{ env.MVN_SETUP }}
+
+      - name: regist exchange
+        if: ${{
+            (
+              (
+                github.event_name == 'push'  && (
+                  startsWith(github.ref, 'refs/heads/release/')
+                  ||  github.ref_name == 'develop'
+                  ||  github.ref_name == 'staging'
+                )
+              )
+              || (github.ref_name != 'main' && github.event_name == 'workflow_dispatch')
+            )
+          }}
+        run: >
+          echo "regist exchange start"
+
+      - name: deploy
+        if: ${{
+          (
+            (
+              github.event_name == 'push'  && (
+                startsWith(github.ref, 'refs/heads/release/')
+                || github.ref_name == 'develop'
+                || github.ref_name == 'staging')
+              )
+              || github.event_name == 'workflow_dispatch'
+            )
+          }}
+        run: >
+          echo "deploy start"
